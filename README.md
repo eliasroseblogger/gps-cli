@@ -12,6 +12,15 @@ A powerful command-line tool for tracking device location across multiple platfo
 
 > 🚀 **Quick Start:** Install in 2 minutes | 🆓 **Free Forever** | 🌍 **Works Everywhere** | 🔒 **Privacy-Focused**
 
+## 🆓 FREE Default Configuration
+
+**Zero configuration required!** GPS-CLI works immediately with:
+- **FREE Traccar Demo Server** (`https://demo2.traccar.org`) - NO account or signup needed!
+- **IP-Based Geolocation** - NO GPS hardware required (city-level accuracy)
+- **Instant Setup** - Just run `gps setup` and you're tracking in seconds
+
+Perfect for testing, personal use, or getting started quickly. Want more precision or privacy? Easily switch to self-hosted options or GPS hardware later!
+
 ## ✨ Features
 
 🌍 **Multi-Provider Support**

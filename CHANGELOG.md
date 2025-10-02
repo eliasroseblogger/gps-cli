@@ -5,6 +5,24 @@ All notable changes to GPS CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-10-02
+
+### Changed
+- **FREE Default Configuration Documentation**
+  - Added prominent section to README emphasizing FREE Traccar demo server
+  - Documented that NO account or signup is required
+  - Highlighted IP-based geolocation requires NO GPS hardware
+  - Updated `.env.sample` with clear FREE configuration header
+  - Emphasized zero-configuration instant setup for new users
+  - Clarified Traccar demo server is the default, self-hosting is optional
+
+### Improved
+- **User Experience**
+  - Clearer messaging about free options
+  - Better onboarding for first-time users
+  - Reduced barrier to entry with prominent free tier information
+  - Enhanced documentation for quick start scenarios
+
 ## [0.2.0] - 2025-10-02
 
 ### Added
