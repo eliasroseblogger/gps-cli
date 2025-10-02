@@ -83,7 +83,7 @@ generate_device_id() {
 
 # Get current location using IP geolocation
 get_ip_location() {
-    print_msg "$CYAN" "📡 Getting location from IP address..."
+    print_msg "$CYAN" "📡 Getting location from IP address..." >&2
     
     # Try ipapi.co first
     local result=$(curl -s "https://ipapi.co/json/" 2>/dev/null)
@@ -94,7 +94,13 @@ get_ip_location() {
         local country=$(echo "$result" | jq -r '.country_name // "Unknown"')
         
         if [ -n "$lat" ] && [ -n "$lon" ]; then
-            echo "{\"latitude\": $lat, \"longitude\": $lon, \"city\": \"$city\", \"country\": \"$country\", \"accuracy\": \"ip\", \"timestamp\": \"$(date -Iseconds)\"}"
+            jq -n \
+                --arg lat "$lat" \
+                --arg lon "$lon" \
+                --arg city "$city" \
+                --arg country "$country" \
+                --arg ts "$(date -Iseconds)" \
+                '{latitude: ($lat|tonumber), longitude: ($lon|tonumber), city: $city, country: $country, accuracy: "ip", timestamp: $ts}'
             return 0
         fi
     fi
@@ -108,12 +114,18 @@ get_ip_location() {
         local country=$(echo "$result" | jq -r '.country // "Unknown"')
         
         if [ -n "$lat" ] && [ -n "$lon" ]; then
-            echo "{\"latitude\": $lat, \"longitude\": $lon, \"city\": \"$city\", \"country\": \"$country\", \"accuracy\": \"ip\", \"timestamp\": \"$(date -Iseconds)\"}"
+            jq -n \
+                --arg lat "$lat" \
+                --arg lon "$lon" \
+                --arg city "$city" \
+                --arg country "$country" \
+                --arg ts "$(date -Iseconds)" \
+                '{latitude: ($lat|tonumber), longitude: ($lon|tonumber), city: $city, country: $country, accuracy: "ip", timestamp: $ts}'
             return 0
         fi
     fi
     
-    print_msg "$RED" "❌ Failed to get IP location"
+    print_msg "$RED" "❌ Failed to get IP location" >&2
     return 1
 }
 
@@ -205,7 +217,7 @@ setup_traccar() {
     set_config "device_id" "$device_id"
     
     local tmp=$(mktemp)
-    jq --arg s "$server" --argjson p "$port" '.traccar_server = $s | .traccar_port = $p' "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
+    jq --arg s "$server" --arg p "$port" '.traccar_server = $s | .traccar_port = ($p|tonumber)' "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
     
     # Generate tracking URL
     local tracking_url="${server}/?deviceId=${device_id}"
@@ -339,8 +351,8 @@ send_location() {
                 --arg lat "$lat" \
                 --arg lon "$lon" \
                 --arg tid "$device_id" \
-                --argjson tst "$timestamp" \
-                '{_type: "location", lat: ($lat|tonumber), lon: ($lon|tonumber), tid: $tid, tst: $tst}')
+                --arg tst "$timestamp" \
+                '{_type: "location", lat: ($lat|tonumber), lon: ($lon|tonumber), tid: $tid, tst: ($tst|tonumber)}')
             curl -s -X POST "$OWNTRACKS_ENDPOINT" \
                 -u "$OWNTRACKS_USERNAME:$OWNTRACKS_PASSWORD" \
                 -H "Content-Type: application/json" \
@@ -362,15 +374,15 @@ send_location() {
     esac
     
     # Save to history
-    local entry=$(jq -n \
-        --argjson loc "$location" \
-        --arg ts "$(date -Iseconds)" \
-        --arg p "$provider" \
-        '{location: $loc, timestamp: $ts, provider: $p}')
-    jq --argjson e "$entry" '. += [$e] | .[-50:]' "$HISTORY_FILE" > "$HISTORY_FILE.tmp" && mv "$HISTORY_FILE.tmp" "$HISTORY_FILE"
+    local tmp=$(mktemp)
+    jq --argjson loc "$location" \
+       --arg ts "$(date -Iseconds)" \
+       --arg p "$provider" \
+       '. += [{location: $loc, timestamp: $ts, provider: $p}] | .[-50:]' \
+       "$HISTORY_FILE" > "$tmp" && mv "$tmp" "$HISTORY_FILE"
     
     # Update last location in config
-    local tmp=$(mktemp)
+    tmp=$(mktemp)
     jq --argjson loc "$location" '.last_location = $loc' "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
 }
 
