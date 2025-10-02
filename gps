@@ -210,7 +210,7 @@ setup_traccar() {
     local port=5055
     
     if [ "$option" = "1" ]; then
-        server="https://demo2.traccar.org"
+        server="https://demo.traccar.org"
         print_msg "$GREEN" "✅ Using Traccar Demo Server"
     else
         read -p "Enter your Traccar server URL (e.g., https://your-server.com): " server
@@ -259,8 +259,11 @@ setup_traccar() {
     echo ""
     print_msg "$CYAN" "💡 Next steps:"
     echo "   1. Run: gps start"
-    echo "   2. Open tracking URL in browser to see your location"
-    echo "   3. Device will appear in dashboard as '$device_name'"
+    echo "   2. Wait 1-2 minutes for device to register"
+    echo "   3. Open tracking URL to see device '$device_name' on map"
+    echo ""
+    print_msg "$YELLOW" "⚠️  Note: Demo server may take time to register new devices"
+    print_msg "$CYAN" "💡 For instant visibility, consider self-hosting Traccar"
     echo ""
     
     log_msg "Traccar setup completed: $server, device: $device_name (ID: $device_id)"
@@ -380,19 +383,26 @@ send_location() {
             # URL encode the identifier for safety
             identifier=$(echo -n "$identifier" | jq -sRr @uri)
             
-            # Use osmand protocol (default port 5055) which allows device identification by name
-            # URL format: http://server:port/?id=identifier&lat=latitude&lon=longitude&timestamp=timestamp
+            # Determine if we should use HTTP or HTTPS based on the server URL
+            local protocol="http"
+            if [[ "$server" == https://* ]]; then
+                # For port 5055 (osmand), always use HTTP even if server is HTTPS
+                server=$(echo "$server" | sed 's/https:/http:/')
+            fi
+            
+            # Use osmand protocol (default port 5055) which allows device identification by name  
+            # URL format: http://server:port/?id=identifier&lat=latitude&lon=longitude&timestamp=unixtime
             local url="${server}:${port}/?id=${identifier}&lat=${lat}&lon=${lon}&timestamp=${timestamp}"
             
             # Send location update with timeout
             local response=$(timeout 10 curl -s -w "\n%{http_code}" --max-time 10 "$url" 2>/dev/null)
             local http_code=$(echo "$response" | tail -n 1)
             
-            # Log if there's an error
+            # Log the result
             if [ "$http_code" = "200" ]; then
-                log_msg "Location sent successfully to Traccar for device $identifier"
-            elif [ -n "$http_code" ] && [ "$http_code" != "000" ]; then
-                log_msg "Warning: Traccar returned HTTP $http_code for device $identifier"
+                log_msg "✅ Location sent successfully to Traccar for device $identifier"
+            else
+                log_msg "⚠️ Traccar returned HTTP $http_code for device $identifier (URL: $url)"
             fi
             ;;
         owntracks)
