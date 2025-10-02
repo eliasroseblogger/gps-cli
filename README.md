@@ -124,7 +124,9 @@ gps help
 gps setup
 ```
 
-Choose **Traccar** (option 1) and select the **FREE demo server** for instant setup!
+Choose **Traccar** (option 1), select the **FREE demo server**, and give your device a name (e.g., "my-laptop" or "gps-tracker")!
+
+The device name will be used to identify your device in the Traccar dashboard.
 
 ### 2. Start Tracking
 
@@ -211,12 +213,15 @@ gps providers
 1. Run `gps setup`
 2. Select option `1` (Traccar)
 3. Select option `1` (Free demo server)
-4. Done! Your tracking URL will be displayed
+4. Enter a device name (e.g., "gps-tracker") or press Enter for auto-generated name
+5. Done! Your tracking URL will be displayed
 
 **Features:**
 - ✅ Free demo server (no registration)
 - ✅ Web-based map interface
 - ✅ Real-time tracking
+- ✅ Custom device names for easy identification
+- ✅ Osmand protocol for better device management
 - ✅ Self-hosted option available
 
 **Web Interface:**
@@ -433,9 +438,10 @@ gps start
 ### Tracking URL Not Working
 
 **Traccar demo server:**
-- URL format: `https://demo2.traccar.org/?deviceId=YOUR_ID`
+- URL format: `https://demo2.traccar.org/?id=YOUR_DEVICE_NAME`
 - Device must send at least one location update first
 - Wait 1-2 minutes after starting tracking
+- Device will appear in the dashboard with the name you chose during setup
 
 **Self-hosted:**
 - Verify server is accessible
@@ -583,14 +589,21 @@ This project is free and open-source. Use, modify, and distribute as you wish.
 
 ## 🗺️ Roadmap
 
-### v0.2.0 (Planned)
+### v0.2.0 (Released)
+- [x] Device naming support
+- [x] Osmand protocol for Traccar
+- [x] Improved IP geolocation stability
+- [x] Better error handling and timeouts
+- [x] JSON parsing fixes
+
+### v0.3.0 (Planned)
 - [ ] Enhanced GPS hardware support
 - [ ] Multiple device tracking
 - [ ] Geofencing alerts
 - [ ] Export location data (CSV, KML)
 - [ ] Web dashboard
 
-### v0.3.0 (Future)
+### v0.4.0 (Future)
 - [ ] Bluetooth beacon support
 - [ ] Wi-Fi positioning
 - [ ] Battery optimization modes
@@ -599,7 +612,7 @@ This project is free and open-source. Use, modify, and distribute as you wish.
 
 ## 📝 Version
 
-Current version: **0.1.0**
+Current version: **0.2.0**
 
 See [CHANGELOG.md](CHANGELOG.md) for version history.
 

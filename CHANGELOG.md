@@ -5,6 +5,49 @@ All notable changes to GPS CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-10-02
+
+### Added
+- 🏷️ **Device naming support** - Name your devices during setup for easy identification
+  - Custom device names (e.g., "gps-tracker", "laptop", "upc")
+  - Auto-generated names with random suffix if not provided
+  - Device name validation (alphanumeric, hyphens, underscores)
+  - Display device name in status and tracking output
+- 🔄 **Osmand protocol support** for Traccar - Better device identification in dashboard
+  - Devices now appear with custom names in Traccar web interface
+  - URL-encoded identifiers for special characters
+  - HTTP response code tracking and logging
+
+### Improved
+- ⏱️ **IP geolocation stability**
+  - Added 10-second timeout to prevent hanging
+  - Rate limit detection and handling
+  - Fallback to alternative services on errors
+  - Better null value checking
+  - Improved error messages for timeout/rate limit scenarios
+- 🔧 **JSON parsing fixes**
+  - Fixed jq argjson errors with proper type conversion
+  - Use jq to construct JSON instead of manual string concatenation
+  - Redirect status messages to stderr to avoid polluting JSON output
+  - Fixed numeric conversions for port and timestamp values
+- 📊 **Enhanced logging**
+  - Log successful location updates to Traccar
+  - Better HTTP status code tracking
+  - Improved error context in log messages
+
+### Changed
+- 🗺️ **Tracking URL format** - Now uses device name instead of device ID
+  - Old format: `https://demo2.traccar.org/?deviceId=abc123`
+  - New format: `https://demo2.traccar.org/?id=gps-tracker`
+- 💻 **Setup flow** - Added device name prompt during Traccar setup
+- 💡 **Status display** - Shows both device name and ID for better clarity
+
+### Fixed
+- 🐛 Fixed hanging during IP geolocation API calls
+- 🐛 Fixed jq parsing errors with invalid JSON input
+- 🐛 Fixed mixed stdout/stderr output contaminating JSON
+- 🐛 Improved backward compatibility with existing configurations
+
 ## [0.1.0] - 2025-10-02
 
 ### Added

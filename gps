@@ -85,47 +85,56 @@ generate_device_id() {
 get_ip_location() {
     print_msg "$CYAN" "📡 Getting location from IP address..." >&2
     
-    # Try ipapi.co first
-    local result=$(curl -s "https://ipapi.co/json/" 2>/dev/null)
+    # Try ipapi.co first (with timeout)
+    local result=$(timeout 10 curl -s --max-time 10 "https://ipapi.co/json/" 2>/dev/null)
     if [ -n "$result" ]; then
-        local lat=$(echo "$result" | jq -r '.latitude // empty')
-        local lon=$(echo "$result" | jq -r '.longitude // empty')
-        local city=$(echo "$result" | jq -r '.city // "Unknown"')
-        local country=$(echo "$result" | jq -r '.country_name // "Unknown"')
-        
-        if [ -n "$lat" ] && [ -n "$lon" ]; then
-            jq -n \
-                --arg lat "$lat" \
-                --arg lon "$lon" \
-                --arg city "$city" \
-                --arg country "$country" \
-                --arg ts "$(date -Iseconds)" \
-                '{latitude: ($lat|tonumber), longitude: ($lon|tonumber), city: $city, country: $country, accuracy: "ip", timestamp: $ts}'
-            return 0
+        # Check for rate limit error
+        local error=$(echo "$result" | jq -r '.error // empty' 2>/dev/null)
+        if [ "$error" = "true" ]; then
+            print_msg "$YELLOW" "⚠️  Rate limited, trying alternative service..." >&2
+        else
+            local lat=$(echo "$result" | jq -r '.latitude // empty' 2>/dev/null)
+            local lon=$(echo "$result" | jq -r '.longitude // empty' 2>/dev/null)
+            local city=$(echo "$result" | jq -r '.city // "Unknown"' 2>/dev/null)
+            local country=$(echo "$result" | jq -r '.country_name // "Unknown"' 2>/dev/null)
+            
+            if [ -n "$lat" ] && [ -n "$lon" ] && [ "$lat" != "null" ] && [ "$lon" != "null" ]; then
+                jq -n \
+                    --arg lat "$lat" \
+                    --arg lon "$lon" \
+                    --arg city "$city" \
+                    --arg country "$country" \
+                    --arg ts "$(date -Iseconds)" \
+                    '{latitude: ($lat|tonumber), longitude: ($lon|tonumber), city: $city, country: $country, accuracy: "ip", timestamp: $ts}'
+                return 0
+            fi
         fi
     fi
     
-    # Fallback to ip-api.com
-    result=$(curl -s "http://ip-api.com/json/" 2>/dev/null)
+    # Fallback to ip-api.com (with timeout)
+    result=$(timeout 10 curl -s --max-time 10 "http://ip-api.com/json/" 2>/dev/null)
     if [ -n "$result" ]; then
-        local lat=$(echo "$result" | jq -r '.lat // empty')
-        local lon=$(echo "$result" | jq -r '.lon // empty')
-        local city=$(echo "$result" | jq -r '.city // "Unknown"')
-        local country=$(echo "$result" | jq -r '.country // "Unknown"')
-        
-        if [ -n "$lat" ] && [ -n "$lon" ]; then
-            jq -n \
-                --arg lat "$lat" \
-                --arg lon "$lon" \
-                --arg city "$city" \
-                --arg country "$country" \
-                --arg ts "$(date -Iseconds)" \
-                '{latitude: ($lat|tonumber), longitude: ($lon|tonumber), city: $city, country: $country, accuracy: "ip", timestamp: $ts}'
-            return 0
+        local status=$(echo "$result" | jq -r '.status // empty' 2>/dev/null)
+        if [ "$status" = "success" ]; then
+            local lat=$(echo "$result" | jq -r '.lat // empty' 2>/dev/null)
+            local lon=$(echo "$result" | jq -r '.lon // empty' 2>/dev/null)
+            local city=$(echo "$result" | jq -r '.city // "Unknown"' 2>/dev/null)
+            local country=$(echo "$result" | jq -r '.country // "Unknown"' 2>/dev/null)
+            
+            if [ -n "$lat" ] && [ -n "$lon" ] && [ "$lat" != "null" ] && [ "$lon" != "null" ]; then
+                jq -n \
+                    --arg lat "$lat" \
+                    --arg lon "$lon" \
+                    --arg city "$city" \
+                    --arg country "$country" \
+                    --arg ts "$(date -Iseconds)" \
+                    '{latitude: ($lat|tonumber), longitude: ($lon|tonumber), city: $city, country: $country, accuracy: "ip", timestamp: $ts}'
+                return 0
+            fi
         fi
     fi
     
-    print_msg "$RED" "❌ Failed to get IP location" >&2
+    print_msg "$RED" "❌ Failed to get IP location (timeout or rate limited)" >&2
     return 1
 }
 
@@ -209,31 +218,52 @@ setup_traccar() {
         port=${custom_port:-5055}
     fi
     
-    # Generate device ID
+    echo ""
+    # Ask for device name
+    print_msg "$CYAN" "Device Name:"
+    read -p "Enter a name for this device (e.g., gps-tracker) [auto-generated]: " device_name
+    
+    # Generate device name if not provided
+    if [ -z "$device_name" ]; then
+        local random=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 6 | head -n 1)
+        device_name="gps-tracker-${random}"
+        print_msg "$YELLOW" "🎲 Generated device name: $device_name"
+    else
+        # Validate device name (alphanumeric, hyphens, underscores)
+        if [[ ! "$device_name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+            print_msg "$RED" "❌ Invalid device name. Use only letters, numbers, hyphens, and underscores"
+            return 1
+        fi
+    fi
+    
+    # Generate device ID for backward compatibility
     local device_id=$(generate_device_id)
     
     # Save configuration
     set_config "provider" "traccar"
     set_config "device_id" "$device_id"
+    set_config "device_name" "$device_name"
     
     local tmp=$(mktemp)
     jq --arg s "$server" --arg p "$port" '.traccar_server = $s | .traccar_port = ($p|tonumber)' "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
     
-    # Generate tracking URL
-    local tracking_url="${server}/?deviceId=${device_id}"
+    # Generate tracking URL using device name
+    local tracking_url="${server}/?id=${device_name}"
     set_config "tracking_url" "$tracking_url"
     
     echo ""
     print_msg "$GREEN" "✅ Traccar configured successfully!"
-    print_msg "$GREEN" "📱 Device ID: $device_id"
+    print_msg "$GREEN" "📱 Device Name: $device_name"
+    print_msg "$GREEN" "🆔 Device ID: $device_id"
     print_msg "$YELLOW" "🗺️  Tracking URL: $tracking_url"
     echo ""
     print_msg "$CYAN" "💡 Next steps:"
     echo "   1. Run: gps start"
     echo "   2. Open tracking URL in browser to see your location"
+    echo "   3. Device will appear in dashboard as '$device_name'"
     echo ""
     
-    log_msg "Traccar setup completed: $server, device: $device_id"
+    log_msg "Traccar setup completed: $server, device: $device_name (ID: $device_id)"
 }
 
 # Setup OwnTracks
@@ -342,8 +372,28 @@ send_location() {
         traccar)
             local server=$(get_config "traccar_server")
             local port=$(get_config "traccar_port")
-            local url="${server}:${port}/?id=${device_id}&lat=${lat}&lon=${lon}&timestamp=${timestamp}"
-            curl -s "$url" >/dev/null 2>&1
+            local device_name=$(get_config "device_name")
+            
+            # Use device_name if available, fallback to device_id for backward compatibility
+            local identifier="${device_name:-$device_id}"
+            
+            # URL encode the identifier for safety
+            identifier=$(echo -n "$identifier" | jq -sRr @uri)
+            
+            # Use osmand protocol (default port 5055) which allows device identification by name
+            # URL format: http://server:port/?id=identifier&lat=latitude&lon=longitude&timestamp=timestamp
+            local url="${server}:${port}/?id=${identifier}&lat=${lat}&lon=${lon}&timestamp=${timestamp}"
+            
+            # Send location update with timeout
+            local response=$(timeout 10 curl -s -w "\n%{http_code}" --max-time 10 "$url" 2>/dev/null)
+            local http_code=$(echo "$response" | tail -n 1)
+            
+            # Log if there's an error
+            if [ "$http_code" = "200" ]; then
+                log_msg "Location sent successfully to Traccar for device $identifier"
+            elif [ -n "$http_code" ] && [ "$http_code" != "000" ]; then
+                log_msg "Warning: Traccar returned HTTP $http_code for device $identifier"
+            fi
             ;;
         owntracks)
             load_env
@@ -429,7 +479,13 @@ start_tracking() {
     echo $! > "$PID_FILE"
     
     print_msg "$GREEN" "✅ Tracking started!"
-    print_msg "$CYAN" "📱 Device ID: $(get_config 'device_id')"
+    
+    local device_name=$(get_config "device_name")
+    if [ -n "$device_name" ] && [ "$device_name" != "null" ]; then
+        print_msg "$CYAN" "📱 Device: $device_name"
+    else
+        print_msg "$CYAN" "📱 Device ID: $(get_config 'device_id')"
+    fi
     
     local tracking_url=$(get_config "tracking_url")
     if [ -n "$tracking_url" ]; then
@@ -469,11 +525,19 @@ show_status() {
     
     local provider=$(get_config "provider")
     local device_id=$(get_config "device_id")
+    local device_name=$(get_config "device_name")
     local interval=$(get_config "update_interval")
     local tracking_url=$(get_config "tracking_url")
     
     print_msg "$CYAN" "Provider: $provider"
-    print_msg "$CYAN" "Device ID: $device_id"
+    
+    if [ -n "$device_name" ] && [ "$device_name" != "null" ]; then
+        print_msg "$CYAN" "Device Name: $device_name"
+        print_msg "$CYAN" "Device ID: $device_id"
+    else
+        print_msg "$CYAN" "Device ID: $device_id"
+    fi
+    
     print_msg "$CYAN" "Update Interval: ${interval}s"
     echo ""
     
