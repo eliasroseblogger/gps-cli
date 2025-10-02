@@ -1,0 +1,58 @@
+# Environment files
+.env
+*.env
+!.env.sample
+
+# Logs
+*.log
+logs/
+
+# Runtime files
+*.pid
+tracker.pid
+
+# Configuration files (contain sensitive data)
+config.json
+history.json
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.sublime-*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+
+# Python cache (if any Python utilities added)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Node modules (if any Node.js utilities added)
+node_modules/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Test coverage
+.coverage
+htmlcov/
+
+# Local testing
+test_*.sh
+debug_*.sh
