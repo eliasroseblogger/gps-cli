@@ -1,0 +1,60 @@
+name: Test Installation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-installation:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        if [ "$RUNNER_OS" = "Linux" ]; then
+          sudo apt-get update
+          sudo apt-get install -y bash curl jq
+        elif [ "$RUNNER_OS" = "macOS" ]; then
+          brew install bash curl jq
+        fi
+
+    - name: Test GPS CLI help
+      run: |
+        chmod +x ./gps
+        ./gps help
+
+    - name: Test GPS CLI providers
+      run: ./gps providers
+
+    - name: Verify script syntax
+      run: bash -n ./gps
+
+    - name: Test installation script
+      run: |
+        chmod +x ./install.sh
+        bash -n ./install.sh
+
+  shellcheck:
+    name: ShellCheck Linting
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Run ShellCheck
+      uses: ludeeus/action-shellcheck@master
+      with:
+        scandir: '.'
+        ignore_paths: '.git .github'
