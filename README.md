@@ -1,6 +1,16 @@
 # 🛰️ GPS CLI - Universal Device Location Tracker
 
+[![Release](https://img.shields.io/github/v/release/alexcolls/gps-cli?style=flat-square)](https://github.com/alexcolls/gps-cli/releases)
+[![License](https://img.shields.io/github/license/alexcolls/gps-cli?style=flat-square)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-blue?style=flat-square)](README.md)
+[![Shell](https://img.shields.io/badge/shell-bash%204.0%2B-green?style=flat-square)](README.md)
+[![CI](https://img.shields.io/github/actions/workflow/status/alexcolls/gps-cli/test.yml?branch=main&style=flat-square&label=tests)](https://github.com/alexcolls/gps-cli/actions)
+[![Issues](https://img.shields.io/github/issues/alexcolls/gps-cli?style=flat-square)](https://github.com/alexcolls/gps-cli/issues)
+[![Stars](https://img.shields.io/github/stars/alexcolls/gps-cli?style=flat-square)](https://github.com/alexcolls/gps-cli/stargazers)
+
 A powerful command-line tool for tracking device location across multiple platforms. Track your Linux, macOS, Windows, Android, or iOS device with ease using free or self-hosted tracking providers.
+
+> 🚀 **Quick Start:** Install in 2 minutes | 🆓 **Free Forever** | 🌍 **Works Everywhere** | 🔒 **Privacy-Focused**
 
 ## ✨ Features
 
