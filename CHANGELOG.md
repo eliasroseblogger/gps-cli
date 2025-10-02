@@ -5,6 +5,59 @@ All notable changes to GPS CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-10-02
+
+### Added
+- 🎨 **Interactive Menu Mode** - Brand new user interface!
+  - Beautiful menu-driven interface with 8 main options
+  - Clear screen and continuous loop for seamless navigation
+  - Color-coded menu items (Green: actions, Cyan: info, Yellow: settings, Magenta: utilities)
+  - Professional box-drawing characters and emoji icons
+  - "Press Enter to continue..." pause after each operation
+  - Runs automatically when `gps` is called without arguments
+- 🔧 **Provider Selection Submenu** - Dedicated interface for choosing tracking providers
+  - Shows all 4 providers with descriptions
+  - Option to return to main menu
+  - Directly integrates with existing setup functions
+- ⚙️ **Default Values Throughout** - All prompts now show default options
+  - Traccar server: defaults to option 1 (demo server)
+  - Port selection: defaults to 5055
+  - Device name: auto-generated if empty
+  - Update interval: shows current value as default (60s)
+  - Consistent format: `"prompt text (default: value):"` or `"[default]"`
+- 🛡️ **Enhanced Error Handling**
+  - Graceful Ctrl+C handling with trap
+  - Invalid selection feedback with 2-second delay
+  - Friendly exit messages
+
+### Improved
+- 🖥️ **User Experience**
+  - Dual-mode operation: interactive (no args) OR command-line (with args)
+  - No need to restart the app between operations
+  - Clear visual feedback for all actions
+  - Better onboarding for new users
+- 🔄 **Helper Functions**
+  - `clear_screen()` - Clears terminal for clean display
+  - `pause()` - Waits for user with colored prompt
+  - `show_main_menu()` - Displays main interactive menu
+  - `show_provider_menu()` - Provider selection submenu
+  - `interactive_mode()` - Main menu loop with trap handling
+
+### Changed
+- 🚀 **Default Behavior** - Running `gps` without arguments now launches interactive menu
+  - Previous: displayed static help text and exited
+  - New: launches beautiful interactive menu interface
+- 💻 **Setup Flow** - All prompts updated to show default values
+
+### Technical
+- ✅ **Backward Compatibility** - All CLI commands still work exactly as before
+  - `gps start`, `gps stop`, `gps status`, etc. unchanged
+  - No breaking changes to existing functionality
+- 📝 **Code Quality**
+  - Added 155 lines of new functionality
+  - Clean separation between interactive and CLI modes
+  - Consistent error handling throughout
+
 ## [0.2.1] - 2025-10-02
 
 ### Changed

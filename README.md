@@ -45,8 +45,11 @@ Perfect for testing, personal use, or getting started quickly. Want more precisi
 - Privacy-focused local storage
 
 🎨 **User-Friendly Interface**
-- Colorful CLI output with emojis
-- Simple command structure
+- 🎉 **NEW:** Interactive menu mode (run `gps` without arguments)
+- Beautiful color-coded menu with 8 options
+- Continuous loop - no need to restart between operations
+- All prompts show default values
+- Simple command structure for CLI automation
 - Comprehensive help system
 
 📊 **Location History**
@@ -127,7 +130,54 @@ gps help
 
 ## 🎯 Quick Start
 
-### 1. Setup Tracking Provider
+### Interactive Mode (Recommended for Beginners)
+
+Simply run `gps` without any arguments to launch the beautiful interactive menu:
+
+```bash
+gps
+```
+
+You'll see a menu like this:
+
+```
+╔════════════════════════════════════════════════════════════════════════════╗
+║           🛰️  GPS CLI - Universal Device Location Tracker v0.3.0         ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+  [1] 🔧 Setup Tracking Provider    - Configure Traccar, OwnTracks, etc.
+  [2] ▶️  Start Tracking             - Begin sending location updates
+  [3] ⏹️  Stop Tracking              - Stop location updates
+  [4] 📊 Show Status                - View tracking status and last location
+  [5] 🗺️  Show Tracking URL          - Display web tracking link
+  [6] ⚙️  Configure Settings         - Adjust update interval and options
+  [7] 📜 View Location History       - Show recent location updates
+  [8] 📡 List Providers              - Show available tracking providers
+
+  [0] 🚪 Exit                        - Quit GPS CLI
+```
+
+**Features:**
+- 🔄 Continuous loop - no need to restart between operations
+- ⌨️ Simple number-based navigation
+- 🎨 Color-coded menu items for easy identification
+- ⚙️ All prompts show default values
+- ⌃C Graceful exit with Ctrl+C
+
+**First Time Setup (via Interactive Menu):**
+1. Select option `[1]` to setup tracking provider
+2. Choose **Traccar** (option 1)
+3. Select **FREE demo server** (default)
+4. Enter a device name (or press Enter for auto-generated)
+5. Back to main menu - select `[2]` to start tracking
+6. Select `[5]` to get your tracking URL
+7. Open the URL in a browser to see your device on the map!
+
+### Command-Line Mode (For Automation & Scripts)
+
+Prefer commands? All CLI functionality is still available:
+
+#### 1. Setup Tracking Provider
 
 ```bash
 gps setup
@@ -137,13 +187,13 @@ Choose **Traccar** (option 1), select the **FREE demo server**, and give your de
 
 The device name will be used to identify your device in the Traccar dashboard.
 
-### 2. Start Tracking
+#### 2. Start Tracking
 
 ```bash
 gps start
 ```
 
-### 3. Get Your Tracking URL
+#### 3. Get Your Tracking URL
 
 ```bash
 gps url
@@ -151,13 +201,13 @@ gps url
 
 Open the URL in any web browser to see your device on a map!
 
-### 4. Check Status
+#### 4. Check Status
 
 ```bash
 gps status
 ```
 
-### 5. Stop Tracking
+#### 5. Stop Tracking
 
 ```bash
 gps stop
