@@ -21,6 +21,17 @@ CYAN='\033[0;36m'
 MAGENTA='\033[0;35m'
 NC='\033[0m'
 
+# Clear screen
+clear_screen() {
+    clear
+}
+
+# Pause and wait for user input
+pause() {
+    echo ""
+    read -p "$(print_msg "$CYAN" "Press Enter to continue...")"
+}
+
 # Initialize data directory
 init_data_dir() {
     mkdir -p "$DATA_DIR" "$DATA_DIR/providers"
@@ -138,6 +149,81 @@ get_ip_location() {
     return 1
 }
 
+# Show main interactive menu
+show_main_menu() {
+    clear_screen
+    print_msg "$BLUE" "╔════════════════════════════════════════════════════════════════════════════╗"
+    print_msg "$BLUE" "║           🛰️  GPS CLI - Universal Device Location Tracker v${VERSION}         ║"
+    print_msg "$BLUE" "╚════════════════════════════════════════════════════════════════════════════╝"
+    echo ""
+    print_msg "$GREEN" "  [1] 🔧 Setup Tracking Provider    - Configure Traccar, OwnTracks, etc."
+    print_msg "$GREEN" "  [2] ▶️  Start Tracking             - Begin sending location updates"
+    print_msg "$GREEN" "  [3] ⏹️  Stop Tracking              - Stop location updates"
+    print_msg "$CYAN" "  [4] 📊 Show Status                - View tracking status and last location"
+    print_msg "$CYAN" "  [5] 🗺️  Show Tracking URL          - Display web tracking link"
+    print_msg "$YELLOW" "  [6] ⚙️  Configure Settings         - Adjust update interval and options"
+    print_msg "$YELLOW" "  [7] 📜 View Location History       - Show recent location updates"
+    print_msg "$MAGENTA" "  [8] 📡 List Providers              - Show available tracking providers"
+    echo ""
+    print_msg "$RED" "  [0] 🚪 Exit                        - Quit GPS CLI"
+    echo ""
+    print_msg "$BLUE" "════════════════════════════════════════════════════════════════════════════"
+}
+
+# Show provider selection submenu
+show_provider_menu() {
+    clear_screen
+    print_msg "$BLUE" "🛰️  GPS CLI Setup - Choose Your Tracking Provider"
+    echo ""
+    print_msg "$GREEN" "Available Providers:"
+    echo "  1) Traccar (Recommended - Free demo available)"
+    echo "     • Web-based tracking interface"
+    echo "     • Real-time map view"
+    echo "     • Free demo server or self-hosted"
+    echo ""
+    echo "  2) OwnTracks (Privacy-focused)"
+    echo "     • Self-hosted MQTT/HTTP"
+    echo "     • End-to-end encryption"
+    echo "     • Requires own server"
+    echo ""
+    echo "  3) PhoneTrack (Nextcloud)"
+    echo "     • Requires Nextcloud instance"
+    echo "     • Session-based tracking"
+    echo "     • Privacy-first"
+    echo ""
+    echo "  4) GPSLogger (Custom backend)"
+    echo "     • Send to any HTTP endpoint"
+    echo "     • Maximum flexibility"
+    echo ""
+    echo "  0) Return to main menu"
+    echo ""
+    
+    read -p "Select provider [0-4]: " choice
+    
+    case $choice in
+        1)
+            setup_traccar
+            ;;
+        2)
+            setup_owntracks
+            ;;
+        3)
+            setup_phonetrack
+            ;;
+        4)
+            setup_gpslogger
+            ;;
+        0)
+            return 0
+            ;;
+        *)
+            print_msg "$RED" "❌ Invalid choice"
+            sleep 2
+            return 1
+            ;;
+    esac
+}
+
 # Check for GPS hardware
 check_gps_hardware() {
     if command -v gpsd >/dev/null 2>&1 && command -v cgps >/dev/null 2>&1; then
@@ -204,7 +290,8 @@ setup_traccar() {
     echo "  2) Use my own Traccar Server (Self-hosted)"
     echo ""
     
-    read -p "Select option [1-2]: " option
+    read -p "Select option [1-2] (default: 1): " option
+    option=${option:-1}
     
     local server=""
     local port=5055
@@ -214,14 +301,14 @@ setup_traccar() {
         print_msg "$GREEN" "✅ Using Traccar Demo Server"
     else
         read -p "Enter your Traccar server URL (e.g., https://your-server.com): " server
-        read -p "Enter port [5055]: " custom_port
+        read -p "Enter Traccar port (default: 5055): " custom_port
         port=${custom_port:-5055}
     fi
     
     echo ""
     # Ask for device name
     print_msg "$CYAN" "Device Name:"
-    read -p "Enter a name for this device (e.g., gps-tracker) [auto-generated]: " device_name
+    read -p "Enter a name for this device [auto-generated]: " device_name
     
     # Generate device name if not provided
     if [ -z "$device_name" ]; then
@@ -605,7 +692,7 @@ configure() {
     print_msg "$CYAN" "Current update interval: ${current_interval}s"
     echo ""
     
-    read -p "Enter new update interval in seconds [${current_interval}]: " new_interval
+    read -p "Enter new update interval in seconds (default: ${current_interval}): " new_interval
     new_interval=${new_interval:-$current_interval}
     
     if [[ "$new_interval" =~ ^[0-9]+$ ]]; then
@@ -713,9 +800,73 @@ list_providers() {
     echo "   • DIY integration"
 }
 
+# Interactive mode with menu loop
+interactive_mode() {
+    # Handle Ctrl+C gracefully
+    trap 'echo ""; print_msg "$YELLOW" "\n⚠️  Interrupted. Exiting..."; echo ""; exit 0' INT
+    
+    while true; do
+        show_main_menu
+        read -p "$(echo -e "${CYAN}Select option [0-8]: ${NC}")" choice
+        echo ""
+        
+        case $choice in
+            1)
+                show_provider_menu
+                pause
+                ;;
+            2)
+                start_tracking
+                pause
+                ;;
+            3)
+                stop_tracking
+                pause
+                ;;
+            4)
+                show_status
+                pause
+                ;;
+            5)
+                show_url
+                pause
+                ;;
+            6)
+                configure
+                pause
+                ;;
+            7)
+                show_history
+                pause
+                ;;
+            8)
+                list_providers
+                pause
+                ;;
+            0)
+                clear_screen
+                print_msg "$GREEN" "✔ Thank you for using GPS CLI!"
+                print_msg "$CYAN" "Goodbye! 👋"
+                echo ""
+                exit 0
+                ;;
+            *)
+                print_msg "$RED" "❌ Invalid option. Please select 0-8."
+                sleep 2
+                ;;
+        esac
+    done
+}
+
 # Main function
 main() {
     init_data_dir
+    
+    # If no arguments provided, launch interactive mode
+    if [[ $# -eq 0 ]]; then
+        interactive_mode
+        return
+    fi
     
     case "${1:-help}" in
         setup)
